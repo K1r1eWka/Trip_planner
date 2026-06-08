@@ -2,7 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+<<<<<<< HEAD
 use App\Http\Controllers\TripController;
+=======
+>>>>>>> 74b2455ef4f87b24059d512bdf51823d93069a71
 
 Route::get("/", function () {
     return view("welcome");
@@ -15,6 +18,7 @@ Route::middleware("guest")->group(function () {
     Route::post("/login", [AuthController::class, "login"]);
 });
 
+<<<<<<< HEAD
 Route::post("/logout", [AuthController::class, "logout"])->middleware("auth")->name("logout");
 
 Route::middleware("auth")->group(function () {
@@ -24,3 +28,6 @@ Route::middleware("auth")->group(function () {
     Route::get("/trips/{trip}", [TripController::class, "show"])->name("trips.show");
     Route::delete("/trips/{trip}", [TripController::class, "destroy"])->name("trips.destroy");
 });
+=======
+Route::post("/logout", [AuthController::class, "logout"])->middleware("auth")->name("logout");
+>>>>>>> 74b2455ef4f87b24059d512bdf51823d93069a71
