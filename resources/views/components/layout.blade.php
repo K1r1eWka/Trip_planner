@@ -13,7 +13,7 @@
 
         .bg-hero {
             min-height: 100vh;
-            background-image: url('{{ asset("images/nature1.png") }}');
+            background-image: var(--bg-image, url('{{ asset("images/image7.png") }}'));
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
