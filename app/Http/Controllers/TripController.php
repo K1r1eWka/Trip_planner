@@ -12,7 +12,7 @@ class TripController extends Controller
     {
         $user = $request->user();
         $ownedTrips = Trip::where("owner_id", $user->id)->get();
-        $memberTrips = $user->trips()->where("owner_id", "!=", $user->id)->get();
+        $memberTrips = $user->trips()->where("trips.owner_id", "!=", $user->id)->get();
 
         return view("trips.index", compact("ownedTrips", "memberTrips"));
     }
