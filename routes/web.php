@@ -23,4 +23,8 @@ Route::middleware("auth")->group(function () {
     Route::post("/trips", [TripController::class, "store"])->name("trips.store");
     Route::get("/trips/{trip}", [TripController::class, "show"])->name("trips.show");
     Route::delete("/trips/{trip}", [TripController::class, "destroy"])->name("trips.destroy");
+
+    Route::post("/trips/{trip}/tasks", [TaskController::class, "store"])->name("tasks.store");
+    Route::patch("/trips/{trip}/tasks/{task}", [TaskController::class, "update"])->name("tasks.update");
+    Route::delete("/trips/{trip}/tasks/{task}", [TaskController::class, "destroy"])->name("tasks.destroy");
 });
