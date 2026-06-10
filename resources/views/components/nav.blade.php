@@ -5,6 +5,7 @@
         </a>
         <div class="navbar-nav ms-auto">
             @auth
+                <a class="nav-link text-white" href="{{ route('trips.index') }}">My Trips</a>
                 <span class="nav-link text-white-50">{{ Auth::user()->name }}</span>
                 <form action="{{ route('logout') }}" method="POST" class="d-inline">
                     @csrf
