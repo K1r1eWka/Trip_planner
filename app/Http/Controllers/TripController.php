@@ -43,9 +43,7 @@ class TripController extends Controller
 
     public function show(Request $request, Trip $trip)
     {
-        $user = $request->user();
-
-        if ($trip->owner_id !== $user->id && !$trip->hasMember($user)) {
+        if ($request->user()->cannot("view", $trip)) {
             abort(403);
         }
 
