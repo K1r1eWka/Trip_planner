@@ -15,8 +15,8 @@
 
         <div class="row g-4">
             {{-- Members --}}
-            <div class="col-md-4">
-                <div class="card h-100" style="background: rgba(255,255,255,0.92);">
+            <div class="col-md-4 align-self-start">
+                <div class="card" style="background: rgba(255,255,255,0.92);">
                     <div class="card-body">
                         <h6 class="fw-semibold mb-3">Members</h6>
                         <ul class="list-unstyled mb-0">
@@ -40,14 +40,47 @@
             </div>
 
             {{-- Tasks --}}
-            <div class="col-md-4">
-                <div class="card h-100" style="background: rgba(255,255,255,0.92);">
+            <div class="col-md-4 align-self-start">
+                <div class="card" style="background: rgba(255,255,255,0.92);">
                     <div class="card-body">
                         <h6 class="fw-semibold mb-3">Tasks</h6>
+                        <form action="{{ route('tasks.store', $trip) }}" method="POST" class="mb-3">
+                            @csrf
+                            <div class="d-flex gap-2 mb-2">
+                                <input type="text" name="title" class="form-control form-control-sm @error('title') is-invalid @enderror" placeholder="Task title..." required>
+                                <button type="submit" class="btn btn-dark btn-sm px-3">Add</button>
+                            </div>
+                            <input type="text" name="description" class="form-control form-control-sm" placeholder="Description (optional)">
+                            @error("title") <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                        </form>
                         @forelse($trip->tasks as $task)
-                            <div class="d-flex align-items-center mb-2">
-                                <span class="badge {{ $task->status === 'done' ? 'bg-success' : 'bg-warning text-dark' }} me-2">{{ $task->status }}</span>
-                                <span class="small">{{ $task->title }}</span>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge {{ $task->status === 'done' ? 'bg-success' : 'bg-warning text-dark' }}">{{ $task->status }}</span>
+                                    <div>
+                                        <span class="small">{{ $task->title }}</span>
+                                        @if($task->description)
+                                            <div class="text-muted" style="font-size: 0.78rem;">{{ $task->description }}</div>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <form action="{{ route('tasks.update', [$trip, $task]) }}" method="POST">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="status" value="{{ $task->status === 'done' ? 'pending' : 'done' }}">
+                                        <button type="submit" class="btn btn-sm {{ $task->status === 'done' ? 'btn-outline-warning' : 'btn-outline-success' }} py-0">
+                                            {{ $task->status === 'done' ? '↩' : '✓' }}
+                                        </button>
+                                    </form>
+                                    @if(Auth::id() === $task->user_id || Auth::user()->cannot('manage', $trip) === false)
+                                        <form action="{{ route('tasks.destroy', [$trip, $task]) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger py-0">×</button>
+                                        </form>
+                                    @endif
+                                </div>
                             </div>
                         @empty
                             <p class="text-muted small mb-0">No tasks yet.</p>
@@ -57,8 +90,8 @@
             </div>
 
             {{-- Expenses --}}
-            <div class="col-md-4">
-                <div class="card h-100" style="background: rgba(255,255,255,0.92);">
+            <div class="col-md-4 align-self-start">
+                <div class="card" style="background: rgba(255,255,255,0.92);">
                     <div class="card-body">
                         <h6 class="fw-semibold mb-3">Expenses</h6>
                         @forelse($trip->expenses as $expense)
