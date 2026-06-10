@@ -14,32 +14,8 @@
         </div>
 
         <div class="row g-4">
-            {{-- Members --}}
-            <div class="col-md-4 align-self-start">
-                <div class="card" style="background: rgba(255,255,255,0.92);">
-                    <div class="card-body">
-                        <h6 class="fw-semibold mb-3">Members</h6>
-                        <ul class="list-unstyled mb-0">
-                            @foreach($trip->members as $member)
-                                <li class="d-flex align-items-center mb-2">
-                                    <span class="badge bg-secondary me-2" style="font-size: 0.75rem;">
-                                        {{ $member->id === $trip->owner_id ? 'Owner' : 'Member' }}
-                                    </span>
-                                    {{ $member->name }}
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                    @can("delete", $trip)
-                        <div class="card-footer bg-transparent border-0 pb-3">
-                            <p class="text-muted small mb-1">Invite code:</p>
-                            <code class="fs-6">{{ $trip->invite_code }}</code>
-                        </div>
-                    @endcan
-                </div>
-            </div>
 
-            {{-- Tasks --}}
+            {{-- Col 1: Tasks --}}
             <div class="col-md-4 align-self-start">
                 <div class="card" style="background: rgba(255,255,255,0.92);">
                     <div class="card-body">
@@ -89,32 +65,8 @@
                 </div>
             </div>
 
-            {{-- Expenses --}}
+            {{-- Col 2: Polls --}}
             <div class="col-md-4 align-self-start">
-                <div class="card" style="background: rgba(255,255,255,0.92);">
-                    <div class="card-body">
-                        <h6 class="fw-semibold mb-3">Expenses</h6>
-                        @forelse($trip->expenses as $expense)
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="small">{{ $expense->title }}</span>
-                                <span class="small fw-semibold">€{{ number_format($expense->amount, 2) }}</span>
-                            </div>
-                        @empty
-                            <p class="text-muted small mb-0">No expenses yet.</p>
-                        @endforelse
-                        @if($trip->expenses->isNotEmpty())
-                            <hr>
-                            <div class="d-flex justify-content-between">
-                                <span class="small fw-semibold">Total</span>
-                                <span class="small fw-bold">€{{ number_format($trip->expenses->sum('amount'), 2) }}</span>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-            {{-- Polls --}}
-            <div class="col-12">
                 <div class="card" style="background: rgba(255,255,255,0.92);">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -160,7 +112,7 @@
                                 @if(!$poll->is_closed && !$userVotedOptionId)
                                     <form action="{{ route('polls.vote', [$trip, $poll]) }}" method="POST">
                                         @csrf
-                                        <div class="d-flex flex-wrap gap-2 mb-2">
+                                        <div class="d-flex flex-column gap-1 mb-2">
                                             @foreach($poll->options as $option)
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="poll_option_id"
@@ -209,6 +161,56 @@
                 </div>
             </div>
 
+            {{-- Col 3: Members + Expenses --}}
+            <div class="col-md-4 align-self-start d-flex flex-column gap-4">
+
+                {{-- Members --}}
+                <div class="card" style="background: rgba(255,255,255,0.92);">
+                    <div class="card-body">
+                        <h6 class="fw-semibold mb-3">Members</h6>
+                        <ul class="list-unstyled mb-0">
+                            @foreach($trip->members as $member)
+                                <li class="d-flex align-items-center mb-2">
+                                    <span class="badge bg-secondary me-2" style="font-size: 0.75rem;">
+                                        {{ $member->id === $trip->owner_id ? 'Owner' : 'Member' }}
+                                    </span>
+                                    {{ $member->name }}
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @can("delete", $trip)
+                        <div class="card-footer bg-transparent border-0 pb-3">
+                            <p class="text-muted small mb-1">Invite code:</p>
+                            <code class="fs-6">{{ $trip->invite_code }}</code>
+                        </div>
+                    @endcan
+                </div>
+
+                {{-- Expenses --}}
+                <div class="card" style="background: rgba(255,255,255,0.92);">
+                    <div class="card-body">
+                        <h6 class="fw-semibold mb-3">Expenses</h6>
+                        @forelse($trip->expenses as $expense)
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="small">{{ $expense->title }}</span>
+                                <span class="small fw-semibold">€{{ number_format($expense->amount, 2) }}</span>
+                            </div>
+                        @empty
+                            <p class="text-muted small mb-0">No expenses yet.</p>
+                        @endforelse
+                        @if($trip->expenses->isNotEmpty())
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <span class="small fw-semibold">Total</span>
+                                <span class="small fw-bold">€{{ number_format($trip->expenses->sum('amount'), 2) }}</span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+            </div>
+
             {{-- Checkpoints --}}
             @if($trip->checkpoints->isNotEmpty())
                 <div class="col-12">
@@ -229,6 +231,7 @@
                     </div>
                 </div>
             @endif
+
         </div>
     </div>
 </x-layout>
