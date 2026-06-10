@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TripController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\PollController;
 
 Route::get("/", function () {
     return view("welcome");
@@ -28,4 +29,10 @@ Route::middleware("auth")->group(function () {
     Route::post("/trips/{trip}/tasks", [TaskController::class, "store"])->name("tasks.store");
     Route::patch("/trips/{trip}/tasks/{task}", [TaskController::class, "update"])->name("tasks.update");
     Route::delete("/trips/{trip}/tasks/{task}", [TaskController::class, "destroy"])->name("tasks.destroy");
+
+    Route::get("/trips/{trip}/polls/create", [PollController::class, "create"])->name("polls.create");
+    Route::post("/trips/{trip}/polls", [PollController::class, "store"])->name("polls.store");
+    Route::post("/trips/{trip}/polls/{poll}/vote", [PollController::class, "vote"])->name("polls.vote");
+    Route::patch("/trips/{trip}/polls/{poll}/close", [PollController::class, "close"])->name("polls.close");
+    Route::delete("/trips/{trip}/polls/{poll}", [PollController::class, "destroy"])->name("polls.destroy");
 });

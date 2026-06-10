@@ -113,6 +113,102 @@
                 </div>
             </div>
 
+            {{-- Polls --}}
+            <div class="col-12">
+                <div class="card" style="background: rgba(255,255,255,0.92);">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="fw-semibold mb-0">Polls</h6>
+                            <a href="{{ route('polls.create', $trip) }}" class="btn btn-dark btn-sm">+ New Poll</a>
+                        </div>
+
+                        @forelse($trip->polls()->with('options.votes')->get() as $poll)
+                            @php
+                                $totalVotes = $poll->options->sum(fn($o) => $o->votes->count());
+                                $userVotedOptionId = $poll->options
+                                    ->flatMap(fn($o) => $o->votes)
+                                    ->where('user_id', Auth::id())
+                                    ->first()?->poll_option_id;
+                            @endphp
+                            <div class="mb-4 pb-3 {{ !$loop->last ? 'border-bottom' : '' }}">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <span class="fw-semibold">{{ $poll->title }}</span>
+                                        <span class="badge bg-secondary ms-2" style="font-size: 0.7rem;">{{ ucfirst($poll->type) }}</span>
+                                        @if($poll->is_closed)
+                                            <span class="badge bg-danger ms-1" style="font-size: 0.7rem;">Closed</span>
+                                        @endif
+                                    </div>
+                                    @can("manage", $trip)
+                                        <div class="d-flex gap-1">
+                                            @if(!$poll->is_closed)
+                                                <form action="{{ route('polls.close', [$trip, $poll]) }}" method="POST">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit" class="btn btn-sm btn-outline-secondary py-0" style="font-size: 0.75rem;">Close</button>
+                                                </form>
+                                            @endif
+                                            <form action="{{ route('polls.destroy', [$trip, $poll]) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger py-0">×</button>
+                                            </form>
+                                        </div>
+                                    @endcan
+                                </div>
+
+                                @if(!$poll->is_closed && !$userVotedOptionId)
+                                    <form action="{{ route('polls.vote', [$trip, $poll]) }}" method="POST">
+                                        @csrf
+                                        <div class="d-flex flex-wrap gap-2 mb-2">
+                                            @foreach($poll->options as $option)
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="poll_option_id"
+                                                        id="option_{{ $option->id }}" value="{{ $option->id }}" required>
+                                                    <label class="form-check-label small" for="option_{{ $option->id }}">
+                                                        {{ $option->title }}
+                                                        <span class="text-muted">({{ $option->votes->count() }})</span>
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                        <button type="submit" class="btn btn-sm btn-dark">Vote</button>
+                                    </form>
+                                @else
+                                    <div class="d-flex flex-column gap-1">
+                                        @foreach($poll->options as $option)
+                                            @php
+                                                $count = $option->votes->count();
+                                                $percent = $totalVotes > 0 ? round($count / $totalVotes * 100) : 0;
+                                                $isMyVote = $userVotedOptionId === $option->id;
+                                            @endphp
+                                            <div>
+                                                <div class="d-flex justify-content-between small mb-1">
+                                                    <span class="{{ $isMyVote ? 'fw-semibold' : '' }}">
+                                                        {{ $option->title }}
+                                                        @if($isMyVote) <span class="text-success">✓</span> @endif
+                                                    </span>
+                                                    <span class="text-muted">{{ $count }} vote{{ $count !== 1 ? 's' : '' }}</span>
+                                                </div>
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar {{ $isMyVote ? 'bg-success' : 'bg-dark' }}"
+                                                        style="width: {{ $percent }}%"></div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    @if($userVotedOptionId)
+                                        <p class="text-muted small mt-2 mb-0">You voted in this poll.</p>
+                                    @endif
+                                @endif
+                            </div>
+                        @empty
+                            <p class="text-muted small mb-0">No polls yet.</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
             {{-- Checkpoints --}}
             @if($trip->checkpoints->isNotEmpty())
                 <div class="col-12">
