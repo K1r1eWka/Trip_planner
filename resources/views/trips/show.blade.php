@@ -191,10 +191,29 @@
                 <div class="card" style="background: rgba(255,255,255,0.92);">
                     <div class="card-body">
                         <h6 class="fw-semibold mb-3">Expenses</h6>
+                        <form action="{{ route('expenses.store', $trip) }}" method="POST" class="mb-3">
+                            @csrf
+                            <div class="d-flex gap-2 mb-1">
+                                <input type="text" name="title" class="form-control form-control-sm @error('title') is-invalid @enderror" placeholder="Title..." required>
+                                <input type="number" name="amount" step="0.01" min="0.01" class="form-control form-control-sm @error('amount') is-invalid @enderror" placeholder="€0.00" style="width: 90px;" required>
+                                <button type="submit" class="btn btn-dark btn-sm px-3">Add</button>
+                            </div>
+                            @error("title") <div class="text-danger small">{{ $message }}</div> @enderror
+                            @error("amount") <div class="text-danger small">{{ $message }}</div> @enderror
+                        </form>
                         @forelse($trip->expenses as $expense)
-                            <div class="d-flex justify-content-between mb-2">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
                                 <span class="small">{{ $expense->title }}</span>
-                                <span class="small fw-semibold">€{{ number_format($expense->amount, 2) }}</span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="small fw-semibold">€{{ number_format($expense->amount, 2) }}</span>
+                                    @if(Auth::id() === $expense->user_id || Auth::user()->cannot('manage', $trip) === false)
+                                        <form action="{{ route('expenses.destroy', [$trip, $expense]) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger py-0">×</button>
+                                        </form>
+                                    @endif
+                                </div>
                             </div>
                         @empty
                             <p class="text-muted small mb-0">No expenses yet.</p>
@@ -208,7 +227,6 @@
                         @endif
                     </div>
                 </div>
-
             </div>
 
             {{-- Checkpoints --}}

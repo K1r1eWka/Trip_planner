@@ -6,6 +6,7 @@ use App\Http\Controllers\TripController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\PollController;
 use App\Http\Controllers\JoinController;
+use App\Http\Controllers\ExpenseController;
 
 Route::get("/", function () {
     return view("welcome");
@@ -36,6 +37,9 @@ Route::middleware("auth")->group(function () {
     Route::post("/trips/{trip}/polls/{poll}/vote", [PollController::class, "vote"])->name("polls.vote");
     Route::patch("/trips/{trip}/polls/{poll}/close", [PollController::class, "close"])->name("polls.close");
     Route::delete("/trips/{trip}/polls/{poll}", [PollController::class, "destroy"])->name("polls.destroy");
+
+    Route::post("/trips/{trip}/expenses", [ExpenseController::class, "store"])->name("expenses.store");
+    Route::delete("/trips/{trip}/expenses/{expense}", [ExpenseController::class, "destroy"])->name("expenses.destroy");
 
     Route::get("/join", [JoinController::class, "show"])->name("trips.join");
     Route::post("/join", [JoinController::class, "join"]);
