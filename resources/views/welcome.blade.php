@@ -10,7 +10,7 @@
             <div class="d-flex gap-3 justify-content-center">
                 @auth
                     <a href="{{ route('trips.create') }}" class="btn btn-light btn-lg px-4 fw-semibold">Create a Trip</a>
-                    <a href="{{ route('trips.index') }}" class="btn btn-outline-light btn-lg px-4">Join with Code</a>
+                    <a href="{{ route('trips.join') }}" class="btn btn-outline-light btn-lg px-4">Join with Code</a>
                 @else
                     <a href="{{ route('login') }}" class="btn btn-light btn-lg px-4 fw-semibold">Create a Trip</a>
                     <a href="{{ route('login') }}" class="btn btn-outline-light btn-lg px-4">Join with Code</a>
