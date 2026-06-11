@@ -184,9 +184,19 @@
                         <div class="card-footer bg-transparent border-0 pb-3">
                             <p class="text-muted small mb-1">Invite code:</p>
                             <code class="fs-6">{{ $trip->invite_code }}</code>
+                            <hr class="my-2">
+                            <p class="text-muted small mb-1">Invite by email:</p>
+                            <form action="{{ route('trips.invite', $trip) }}" method="POST">
+                                @csrf
+                                <div class="d-flex gap-2">
+                                    <input type="email" name="email" class="form-control form-control-sm" placeholder="friend@email.com" required>
+                                    <button type="submit" class="btn btn-dark btn-sm px-3">Send</button>
+                                </div>
+                            </form>
                         </div>
                     @endcan
                 </div>
+
 
                 {{-- Expenses --}}
                 <div class="card" style="background: rgba(255,255,255,0.92);">

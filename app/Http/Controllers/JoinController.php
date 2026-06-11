@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Events\MemberJoined;
+use App\Mail\MemberJoinedMail;
 use App\Models\Trip;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class JoinController extends Controller
 {
@@ -32,6 +34,8 @@ class JoinController extends Controller
         $trip->members()->attach($request->user()->id);
 
         broadcast(new MemberJoined($trip, $request->user()))->toOthers();
+
+        Mail::to($trip->owner->email)->send(new MemberJoinedMail($trip, $request->user()));
 
         return redirect()->route("trips.show", $trip)->with("success", "You joined the trip!");
     }
