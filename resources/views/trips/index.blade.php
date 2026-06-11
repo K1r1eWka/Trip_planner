@@ -26,7 +26,7 @@
                                 @if($trip->description)
                                     <p class="card-text text-muted small">{{ \Illuminate\Support\Str::limit($trip->description, 80) }}</p>
                                 @endif
-                                <span class="badge bg-secondary mb-2">Owner</span>
+                                <span class="badge bg-secondary mb-2">You: Owner</span>
                             </div>
                             <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center pb-3">
                                 <a href="{{ route('trips.show', $trip) }}" class="btn btn-dark btn-sm">View</a>
@@ -53,7 +53,7 @@
                                 @if($trip->description)
                                     <p class="card-text text-muted small">{{ \Illuminate\Support\Str::limit($trip->description, 80) }}</p>
                                 @endif
-                                <span class="badge bg-primary mb-2">Member</span>
+                                <span class="badge bg-primary mb-2">You: Member</span>
                             </div>
                             <div class="card-footer bg-transparent border-0 pb-3">
                                 <a href="{{ route('trips.show', $trip) }}" class="btn btn-dark btn-sm">View</a>
