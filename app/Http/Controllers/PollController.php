@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PollCreated;
+use App\Events\VoteCast;
 use App\Models\Poll;
 use App\Models\PollOption;
 use App\Models\Trip;
@@ -48,6 +50,8 @@ class PollController extends Controller
             }
         }
 
+        broadcast(new PollCreated($poll, $trip))->toOthers();
+
         return redirect()->route("trips.show", $trip)->with("success", "Poll created!");
     }
 
@@ -84,6 +88,22 @@ class PollController extends Controller
             "user_id" => $request->user()->id,
             "poll_option_id" => $optionId,
         ]);
+
+        $poll->load("options.votes");
+        $totalVotes = $poll->options->sum(fn($o) => $o->votes->count());
+
+        $options = $poll->options->map(fn($o) => [
+            "id" => $o->id,
+            "title" => $o->title,
+            "votes" => $o->votes->count(),
+            "percent" => $totalVotes > 0 ? round($o->votes->count() / $totalVotes * 100) : 0,
+        ]);
+
+        broadcast(new VoteCast($poll, $trip))->toOthers();
+
+        if ($request->expectsJson()) {
+            return response()->json(["options" => $options, "voted_option_id" => $optionId]);
+        }
 
         return redirect()->route("trips.show", $trip)->with("success", "Vote recorded!");
     }

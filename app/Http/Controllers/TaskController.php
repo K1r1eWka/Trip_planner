@@ -2,12 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\TaskUpdated;
 use App\Models\Task;
 use App\Models\Trip;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
+    private function tasksPayload(Trip $trip): array
+    {
+        return $trip->tasks()->get()->map(fn($t) => [
+            "id" => $t->id,
+            "title" => $t->title,
+            "description" => $t->description,
+            "status" => $t->status,
+            "user_id" => $t->user_id,
+        ])->toArray();
+    }
+
     public function store(Request $request, Trip $trip)
     {
         if ($request->user()->cannot("view", $trip)) {
@@ -19,13 +31,19 @@ class TaskController extends Controller
             "description" => "nullable|max:1000",
         ]);
 
-        Task::create([
+        $task = Task::create([
             "trip_id" => $trip->id,
             "user_id" => $request->user()->id,
             "title" => $request->title,
             "description" => $request->description,
             "status" => "pending",
         ]);
+
+        broadcast(new TaskUpdated($trip))->toOthers();
+
+        if ($request->expectsJson()) {
+            return response()->json(["tasks" => $this->tasksPayload($trip), "current_user_id" => $request->user()->id]);
+        }
 
         return redirect()->route("trips.show", $trip)->with("success", "Task added!");
     }
@@ -42,6 +60,12 @@ class TaskController extends Controller
 
         $task->update(["status" => $request->status]);
 
+        broadcast(new TaskUpdated($trip))->toOthers();
+
+        if ($request->expectsJson()) {
+            return response()->json(["tasks" => $this->tasksPayload($trip), "current_user_id" => $request->user()->id]);
+        }
+
         return redirect()->route("trips.show", $trip)->with("success", "Task updated!");
     }
 
@@ -52,6 +76,12 @@ class TaskController extends Controller
         }
 
         $task->delete();
+
+        broadcast(new TaskUpdated($trip))->toOthers();
+
+        if ($request->expectsJson()) {
+            return response()->json(["tasks" => $this->tasksPayload($trip), "current_user_id" => $request->user()->id]);
+        }
 
         return redirect()->route("trips.show", $trip)->with("success", "Task deleted.");
     }

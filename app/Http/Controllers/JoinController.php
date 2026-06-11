@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MemberJoined;
 use App\Models\Trip;
 use Illuminate\Http\Request;
 
@@ -29,6 +30,8 @@ class JoinController extends Controller
         }
 
         $trip->members()->attach($request->user()->id);
+
+        broadcast(new MemberJoined($trip, $request->user()))->toOthers();
 
         return redirect()->route("trips.show", $trip)->with("success", "You joined the trip!");
     }
